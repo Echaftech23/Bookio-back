@@ -6,27 +6,29 @@ Content-Type: application/json
   "title": "The Great Gatsby",
   "author": "F. Scott Fitzgerald",
   "publishedDate": "1925-04-10",
-  "isbn": "9780743273565",
-  "summary": "A novel about the American dream."
+  "status": "available",
+  "description": "A novel about the American dream.",
+  "image": "https://example.com/image.jpg"
 }
 
 ### Get all books
 GET http://localhost:3001/api/books
 
 ### Get a single book by ID
-GET http://localhost:3001/api/books/676bcf002a556c86c794f693
+GET http://localhost:3001/api/books/676bdc17df7f0b0f16885976
 
 ### Update a book by ID
-PATCH http://localhost:3001/api/books/676bcf002a556c86c794f693
+PATCH http://localhost:3001/api/books/676bdc17df7f0b0f16885976
 Content-Type: application/json
 
 {
   "title": "The Great Gatsby (Updated)",
   "author": "F. Scott Fitzgerald",
   "publishedDate": "1925-04-10",
-  "isbn": "9780743273565",
-  "summary": "A novel about the American dream, updated."
+  "status": "available",
+  "description": "A novel about the American dream, updated.",
+  "image": "https://example.com/updated-image.jpg"
 }
 
 ### Delete a book by ID
-DELETE http://localhost:3001/api/books/676bcf002a556c86c794f693
+DELETE http://localhost:3001/api/books/676bdc17df7f0b0f16885976
