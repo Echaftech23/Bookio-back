@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ### Get all books
-GET http://localhost:3001/api/books
+GET http://localhost:3001/api/books?page=1
 
 ### Get a single book by ID
 GET http://localhost:3001/api/books/676bdc17df7f0b0f16885976

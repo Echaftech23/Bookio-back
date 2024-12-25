@@ -14,8 +14,9 @@ export class BooksService {
     return createdBook.save();
   }
 
-  async findAll(): Promise<Book[]> {
-    return this.bookModel.find().exec();
+  async findAll(page: number = 1, limit: number = 6): Promise<Book[]> {
+    const skip = (page - 1) * limit;
+    return this.bookModel.find().skip(skip).limit(limit).exec();
   }
 
   async findOne(id: string): Promise<Book> {
