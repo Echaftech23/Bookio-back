@@ -1,0 +1,10 @@
+### Upload File
+POST http://localhost:3001/api/uploads
+Content-Type: multipart/form-data; boundary=WebKitFormBoundary
+
+--WebKitFormBoundary
+Content-Disposition: form-data; name="file"; filename="network.png"
+Content-Type: image/png
+
+< ./network.png
+--WebKitFormBoundary--

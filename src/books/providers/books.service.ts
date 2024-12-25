@@ -4,14 +4,24 @@ import { Model } from 'mongoose';
 import { CreateBookDto } from '../dto/create-book.dto';
 import { UpdateBookDto } from '../dto/update-book.dto';
 import { Book } from '../entities/book.entity';
+import { UploadsService } from '../../uploads/providers/uploads.service';
 
 @Injectable()
 export class BooksService {
-  constructor(@InjectModel(Book.name) private bookModel: Model<Book>) {}
+  constructor(
+    @InjectModel(Book.name) private bookModel: Model<Book>,
+    private readonly uploadsService: UploadsService,
+  ) {}
 
-  async create(createBookDto: CreateBookDto): Promise<Book> {
-    const createdBook = new this.bookModel(createBookDto);
-    return createdBook.save();
+  async create(
+    createBookDto: CreateBookDto,
+    file?: Express.Multer.File,
+  ): Promise<Book> {
+    let image = createBookDto.image;
+    if (file) image = await this.uploadsService.uploadFile(file);
+
+    const createBook = new this.bookModel({ ...createBookDto, image });
+    return createBook.save();
   }
 
   async findAll(page: number = 1, limit: number = 6): Promise<Book[]> {

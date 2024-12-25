@@ -1,15 +1,34 @@
-### Create a new book
+### Create a new book with image upload
 POST http://localhost:3001/api/books
-Content-Type: application/json
+Content-Type: multipart/form-data; boundary=WebKitFormBoundary
 
-{
-  "title": "The Great Gatsby",
-  "author": "F. Scott Fitzgerald",
-  "publishedDate": "1925-04-10",
-  "status": "available",
-  "description": "A novel about the American dream.",
-  "image": "https://example.com/image.jpg"
-}
+--WebKitFormBoundary
+Content-Disposition: form-data; name="file"; filename="network.png"
+Content-Type: image/png
+
+< ./network.png
+--WebKitFormBoundary
+Content-Disposition: form-data; name="title"
+
+The Great Mama
+--WebKitFormBoundary
+Content-Disposition: form-data; name="author"
+
+F. Scott Fitzgerald
+--WebKitFormBoundary
+Content-Disposition: form-data; name="publishedDate"
+
+1925-04-10
+--WebKitFormBoundary
+Content-Disposition: form-data; name="status"
+
+available
+--WebKitFormBoundary
+Content-Disposition: form-data; name="description"
+
+A novel about the American dream.
+--WebKitFormBoundary--
+
 
 ### Get all books
 GET http://localhost:3001/api/books?page=1
