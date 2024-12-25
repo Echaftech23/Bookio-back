@@ -1,0 +1,32 @@
+### Create a new book
+POST http://localhost:3001/api/books
+Content-Type: application/json
+
+{
+  "title": "The Great Gatsby",
+  "author": "F. Scott Fitzgerald",
+  "publishedDate": "1925-04-10",
+  "isbn": "9780743273565",
+  "summary": "A novel about the American dream."
+}
+
+### Get all books
+GET http://localhost:3001/api/books
+
+### Get a single book by ID
+GET http://localhost:3001/api/books/676bcf002a556c86c794f693
+
+### Update a book by ID
+PATCH http://localhost:3001/api/books/676bcf002a556c86c794f693
+Content-Type: application/json
+
+{
+  "title": "The Great Gatsby (Updated)",
+  "author": "F. Scott Fitzgerald",
+  "publishedDate": "1925-04-10",
+  "isbn": "9780743273565",
+  "summary": "A novel about the American dream, updated."
+}
+
+### Delete a book by ID
+DELETE http://localhost:3001/api/books/676bcf002a556c86c794f693
