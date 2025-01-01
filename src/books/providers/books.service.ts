@@ -15,18 +15,27 @@ export class BooksService {
 
   async create(
     createBookDto: CreateBookDto,
-    file?: Express.Multer.File,
+    file: Express.Multer.File,
   ): Promise<Book> {
-    let image = createBookDto.image;
-    if (file) image = await this.uploadsService.uploadFile(file);
+    if (!file) {
+      throw new NotFoundException('Image not found');
+    }
 
+    const image = await this.uploadsService.uploadFile(file);
     const createBook = new this.bookModel({ ...createBookDto, image });
     return createBook.save();
   }
 
-  async findAll(page: number = 1, limit: number = 6): Promise<Book[]> {
+  async findAll(
+    page: number = 1,
+    limit: number = 6,
+  ): Promise<{ books: Book[]; totalBooks: number }> {
     const skip = (page - 1) * limit;
-    return this.bookModel.find().skip(skip).limit(limit).exec();
+    const [books, totalBooks] = await Promise.all([
+      this.bookModel.find().skip(skip).limit(limit).exec(),
+      this.bookModel.countDocuments().exec(),
+    ]);
+    return { books, totalBooks };
   }
 
   async findOne(id: string): Promise<Book> {
@@ -37,7 +46,55 @@ export class BooksService {
     return book;
   }
 
-  async update(id: string, updateBookDto: UpdateBookDto): Promise<Book> {
+  async update(
+    id: string,
+    updateBookDto: UpdateBookDto,
+    file?: Express.Multer.File,
+  ): Promise<Book> {
+    const book = await this.findBookById(id);
+
+    if (file) {
+      const newImageUrl = await this.handleFileUpload(book, file);
+      updateBookDto.image = newImageUrl;
+    }
+
+    return this.updateBook(id, updateBookDto);
+  }
+
+  async remove(id: string): Promise<void> {
+    const book = await this.findBookById(id);
+    if (book.image) {
+      await this.uploadsService.deleteFile(book.image);
+    }
+    const result = await this.bookModel.findByIdAndDelete(id).exec();
+    if (!result) {
+      throw new NotFoundException(`Book with ID ${id} not found`);
+    }
+  }
+
+  private async findBookById(id: string): Promise<Book> {
+    const book = await this.bookModel.findById(id).exec();
+    if (!book) {
+      throw new NotFoundException(`Book with ID ${id} not found`);
+    }
+    return book;
+  }
+
+  private async handleFileUpload(
+    book: Book,
+    file: Express.Multer.File,
+  ): Promise<string> {
+    if (book.image) {
+      await this.uploadsService.deleteFile(book.image);
+    }
+    const newImageUrl = await this.uploadsService.uploadFile(file);
+    return newImageUrl;
+  }
+
+  private async updateBook(
+    id: string,
+    updateBookDto: UpdateBookDto,
+  ): Promise<Book> {
     const updatedBook = await this.bookModel
       .findByIdAndUpdate(id, updateBookDto, { new: true })
       .exec();
@@ -45,12 +102,5 @@ export class BooksService {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
     return updatedBook;
-  }
-
-  async remove(id: string): Promise<void> {
-    const result = await this.bookModel.findByIdAndDelete(id).exec();
-    if (!result) {
-      throw new NotFoundException(`Book with ID ${id} not found`);
-    }
   }
 }
