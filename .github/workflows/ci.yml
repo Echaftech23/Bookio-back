@@ -1,14 +1,6 @@
 name: CI Pipeline
 
 on:
-  # pull_request:
-  #   branches:
-  #     - main
-  # workflow_run:
-  #   workflows: ["Tests"]
-  #   types:
-  #     - completed
-  #   branches: [ "main" ]
   push:
     branches: [ "feat/BB-13-cicd-workflow" ]
 
@@ -40,5 +32,3 @@ jobs:
       - name: show failure message
         if: failure()
         run: echo "Docker image build and push failed"
-
-      
