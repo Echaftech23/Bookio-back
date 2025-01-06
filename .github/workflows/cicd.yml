@@ -1,0 +1,88 @@
+name: CICD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Dockerhub
+        run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+      - name: Build the Docker image
+        run: docker build -t echaf/bookio-app-back:latest .
+
+      - name: Push to Dockerhub
+        run: docker push echaf/bookio-app-back:latest
+
+      - name: show success message
+        if: success()
+        run: echo "Docker image built and pushed successfully"
+
+      - name: show failure message
+        if: failure()
+        run: echo "Docker image build and push failed"
+
+  
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull Docker image
+        run: |
+          echo "Pulling latest Docker image..."
+          sudo docker pull echaf/bookio-app-back:latest
+          
+      - name: Stop Old Container
+        run: |
+          echo "Stopping old container if exists..."
+          sudo docker rm -f bookio-app-back-container || true
+      
+      - name: Run Docker Container
+        id: run-container
+        run: |
+          sudo docker run -d -p 3001:3001 --name bookio-app-back-container \
+            -e PORT=3001 \
+            -e AWS_PUBLIC_BUCKET_NAME="${{ secrets.AWS_PUBLIC_BUCKET_NAME }}" \
+            -e AWS_REGION="${{ secrets.AWS_REGION }}" \
+            -e AWS_CLOUDFRONT_URL="${{ secrets.AWS_CLOUDFRONT_URL }}" \
+            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -e AWS_REGION_DB="${{ secrets.AWS_REGION_DB }}" \
+            -e SECRET_KEY_ID="${{ secrets.SECRET_KEY_ID }}" \
+            -e SECRET_ACCESS_KEY="${{ secrets.SECRET_ACCESS_KEY }}" \
+            echaf/bookio-app-back
+
+      - name: Log Docker Container Output
+        run: |
+          echo "Fetching Docker container logs..."
+          sudo docker logs bookio-app-back-container || true
+          
+      - name: show success message
+        if: success()
+        run: echo "Deployment successful"
+          
+      - name: Rollback on Deployment Failure
+        if: failure()
+        run: |
+          echo "Deployment failed, rolling back..."
+          sudo docker rm -f bookio-app-back-container || true
+          sudo docker run -d \
+            -p 3001:3001 \
+            --name bookio-app-back-container \
+            -e PORT=3001 \
+            echaf/bookio-app-back:previous
+          
+      - name: show failure message
+        if: failure()
+        run: echo "Deployment failed"

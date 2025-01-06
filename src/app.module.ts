@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { BooksModule } from './books/books.module';
-import { DatabaseModule } from './database/database.module';
+// import { DatabaseModule } from './database/database.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { DynamodbModule } from './dynamodb/dynamodb.module';
 
 @Module({
   imports: [
@@ -10,7 +11,7 @@ import { UploadsModule } from './uploads/uploads.module';
       isGlobal: true,
     }),
     BooksModule,
-    DatabaseModule,
+    DynamodbModule,
     UploadsModule,
   ],
 })

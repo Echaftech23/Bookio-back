@@ -1,4 +1,8 @@
-import { Injectable, RequestTimeoutException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
 import * as path from 'path';
@@ -6,13 +10,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UploadToAwsProvider {
-  constructor(private readonly ConfigService: ConfigService) {}
+  private readonly s3: S3;
+  constructor(private readonly ConfigService: ConfigService) {
+    this.s3 = new S3();
+  }
 
   public async fileUpload(file: Express.Multer.File) {
-    const s3 = new S3();
-
     try {
-      const uploadResult = await s3
+      const uploadResult = await this.s3
         .upload({
           Bucket: this.ConfigService.get<string>('AWS_PUBLIC_BUCKET_NAME'),
           Key: this.generateFileName(file),
@@ -40,5 +45,18 @@ export class UploadToAwsProvider {
 
     // Return file uuid
     return `${name}-${timestamp}-${uuidv4()}${extension}${extension}`;
+  }
+
+  public async fileDelete(fileName: string) {
+    try {
+      await this.s3
+        .deleteObject({
+          Bucket: this.ConfigService.get<string>('AWS_PUBLIC_BUCKET_NAME'),
+          Key: fileName,
+        })
+        .promise();
+    } catch (error) {
+      throw new ConflictException(error);
+    }
   }
 }

@@ -34,4 +34,13 @@ export class UploadsService {
       throw new ConflictException(error);
     }
   }
+
+  public async deleteFile(imageUrl: string) {
+    try {
+      const fileName = imageUrl.split('/').pop();
+      await this.UploadToAwsProvider.fileDelete(fileName);
+    } catch (error) {
+      throw new ConflictException(error);
+    }
+  }
 }

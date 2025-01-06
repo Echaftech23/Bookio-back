@@ -23,8 +23,9 @@ export class BooksController {
   @UseInterceptors(FileInterceptor('file'))
   create(
     @Body() createBookDto: CreateBookDto,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ) {
+    console.log('book data', createBookDto);
     return this.booksService.create(createBookDto, file);
   }
 
@@ -39,8 +40,14 @@ export class BooksController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.booksService.update(id, updateBookDto);
+  @UseInterceptors(FileInterceptor('file'))
+  update(
+    @Param('id') id: string,
+    @Body() updateBookDto: UpdateBookDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    console.log('updated data', updateBookDto);
+    return this.booksService.update(id, updateBookDto, file);
   }
 
   @Delete(':id')
