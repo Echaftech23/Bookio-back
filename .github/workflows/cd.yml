@@ -1,11 +1,12 @@
 name: CD Pipeline
 
 on:
-  workflow_run:
-    workflows: ["CI Pipeline"]
-    types:
-      - completed
-    branches: [ "*" ]
+  # workflow_run:
+  #   workflows: ["CI Pipeline"]
+  #   types:
+  #     - completed
+  push:
+    branches: [ "feat/BB-13-cicd-workflow" ]
 
 jobs:
   deploy:
