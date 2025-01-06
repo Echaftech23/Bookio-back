@@ -1,0 +1,53 @@
+### Create a new book with image upload
+POST http://localhost:3001/api/books
+Content-Type: multipart/form-data; boundary=WebKitFormBoundary
+
+--WebKitFormBoundary
+Content-Disposition: form-data; name="file"; filename="network.png"
+Content-Type: image/png
+
+< ./network.png
+--WebKitFormBoundary
+Content-Disposition: form-data; name="title"
+
+The Great Mama
+--WebKitFormBoundary
+Content-Disposition: form-data; name="author"
+
+F. Scott Fitzgerald
+--WebKitFormBoundary
+Content-Disposition: form-data; name="publishedDate"
+
+1925-04-10
+--WebKitFormBoundary
+Content-Disposition: form-data; name="status"
+
+available
+--WebKitFormBoundary
+Content-Disposition: form-data; name="description"
+
+A novel about the American dream.
+--WebKitFormBoundary--
+
+
+### Get all books
+GET http://localhost:3001/api/books?page=1
+
+### Get a single book by ID
+GET http://localhost:3001/api/books/676bdc17df7f0b0f16885976
+
+### Update a book by ID
+PATCH http://localhost:3001/api/books/676bdc17df7f0b0f16885976
+Content-Type: application/json
+
+{
+  "title": "The Great Gatsby (Updated)",
+  "author": "F. Scott Fitzgerald",
+  "publishedDate": "1925-04-10",
+  "status": "available",
+  "description": "A novel about the American dream, updated.",
+  "image": "https://example.com/updated-image.jpg"
+}
+
+### Delete a book by ID
+DELETE http://localhost:3001/api/books/676bdc17df7f0b0f16885976
