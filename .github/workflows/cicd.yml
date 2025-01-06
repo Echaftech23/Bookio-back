@@ -2,7 +2,7 @@ name: CICD Pipeline
 
 on:
   push:
-    branches: [ "feat/BB-13-cicd-workflow" ]
+    branches: [ "main" ]
 
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
